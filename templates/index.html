@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>ComicCraft - AI Comic Story Creator</title>
+
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #080b1f,
+            #17113b,
+            #0b1630
+        );
+
+    color: white;
+
+    min-height: 100vh;
+}
+
+
+.container {
+
+    width: 92%;
+
+    max-width: 1200px;
+
+    margin: auto;
+}
+
+
+/* ==================================================
+   HEADER
+   ================================================== */
+
+header {
+
+    text-align: center;
+
+    padding: 50px 20px 30px;
+}
+
+
+.badge {
+
+    display: inline-block;
+
+    padding: 8px 16px;
+
+    border-radius: 30px;
+
+    background: rgba(255,255,255,0.1);
+
+    border: 1px solid
+        rgba(255,255,255,0.2);
+
+    font-size: 13px;
+
+    letter-spacing: 1px;
+}
+
+
+h1 {
+
+    font-size: 52px;
+
+    margin: 20px 0 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #c5b7ff
+        );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+
+.subtitle {
+
+    color: #b9b5d4;
+
+    font-size: 18px;
+}
+
+
+/* ==================================================
+   FORM CARD
+   ================================================== */
+
+.card {
+
+    background:
+        rgba(255,255,255,0.07);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.12);
+
+    border-radius: 24px;
+
+    padding: 30px;
+
+    backdrop-filter:
+        blur(15px);
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,0.3);
+
+    margin-bottom: 40px;
+}
+
+
+label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #e7e4ff;
+}
+
+
+input,
+textarea,
+select {
+
+    width: 100%;
+
+    padding: 14px;
+
+    margin-bottom: 20px;
+
+    border-radius: 12px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+
+    background:
+        rgba(0,0,0,0.25);
+
+    color: white;
+
+    outline: none;
+
+    font-size: 15px;
+}
+
+
+textarea {
+
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+
+select option {
+
+    background: #17132e;
+
+    color: white;
+}
+
+
+/* ==================================================
+   BUTTON
+   ================================================== */
+
+button {
+
+    border: none;
+
+    border-radius: 14px;
+
+    padding: 15px 25px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.generate-btn {
+
+    width: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7057ff,
+            #a855f7
+        );
+
+    color: white;
+
+    box-shadow:
+        0 10px 30px
+        rgba(112,87,255,0.3);
+}
+
+
+.generate-btn:hover {
+
+    transform: translateY(-2px);
+}
+
+
+.generate-btn:disabled {
+
+    opacity: 0.6;
+
+    cursor: wait;
+}
+
+
+/* ==================================================
+   LOADING
+   ================================================== */
+
+.loading {
+
+    display: none;
+
+    text-align: center;
+
+    padding: 30px;
+
+    color: #c8c3e8;
+}
+
+
+.spinner {
+
+    width: 40px;
+
+    height: 40px;
+
+    border:
+        4px solid
+        rgba(255,255,255,0.2);
+
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation:
+        spin 1s linear infinite;
+
+    margin:
+        0 auto 15px;
+}
+
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* ==================================================
+   RESULT
+   ================================================== */
+
+#result {
+
+    display: none;
+
+    margin-bottom: 60px;
+}
+
+
+.story-title {
+
+    text-align: center;
+
+    font-size: 38px;
+
+    margin-bottom: 15px;
+}
+
+
+.introduction {
+
+    max-width: 850px;
+
+    margin:
+        0 auto 35px;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,0.06);
+
+    color: #d4d1e6;
+
+    line-height: 1.7;
+
+    text-align: center;
+}
+
+
+/* ==================================================
+   COMIC GRID
+   ================================================== */
+
+.comic-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 28px;
+}
+
+
+.panel {
+
+    overflow: hidden;
+
+    border-radius: 22px;
+
+    background:
+        #15132c;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.12);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,0.25);
+}
+
+
+.panel-number {
+
+    padding: 15px 20px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    background:
+        rgba(255,255,255,0.05);
+}
+
+
+/* ==================================================
+   IMAGE
+   ================================================== */
+
+.panel-image {
+
+    width: 100%;
+
+    background: #080914;
+
+    overflow: hidden;
+}
+
+
+.panel-image img {
+
+    width: 100%;
+
+    display: block;
+
+    aspect-ratio: 4 / 3;
+
+    object-fit: cover;
+
+    transition: transform 0.3s;
+}
+
+
+.panel:hover
+.panel-image img {
+
+    transform: scale(1.03);
+}
+
+
+/* ==================================================
+   STORY TEXT BELOW IMAGE
+   ================================================== */
+
+.panel-content {
+
+    padding: 22px;
+}
+
+
+.story-label,
+.dialogue-label {
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+
+    color: #a99cff;
+}
+
+
+.story-text {
+
+    color: #e4e1ef;
+
+    line-height: 1.7;
+
+    margin-bottom: 20px;
+}
+
+
+.dialogue {
+
+    padding: 15px 18px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(112,87,255,0.12);
+
+    border:
+        1px solid
+        rgba(112,87,255,0.25);
+
+    color: white;
+
+    font-style: italic;
+
+    line-height: 1.5;
+
+    position: relative;
+}
+
+
+.dialogue::before {
+
+    content: "💬";
+
+    margin-right: 8px;
+
+}
+
+
+/* ==================================================
+   BOTTOM BUTTONS
+   ================================================== */
+
+.actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    margin-top: 40px;
+
+    flex-wrap: wrap;
+}
+
+
+.pdf-btn {
+
+    background: white;
+
+    color: #17132e;
+}
+
+
+.new-btn {
+
+    background:
+        rgba(255,255,255,0.1);
+
+    color: white;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.15);
+}
+
+
+/* ==================================================
+   ERROR
+   ================================================== */
+
+.error {
+
+    display: none;
+
+    padding: 18px;
+
+    margin-top: 20px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,70,70,0.12);
+
+    border:
+        1px solid
+        rgba(255,70,70,0.3);
+
+    color: #ffb7b7;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+   ================================================== */
+
+@media (max-width: 800px) {
+
+    h1 {
+        font-size: 38px;
+    }
+
+    .comic-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<header>
+
+    <div class="badge">
+        ✦ POWERED BY AI
+    </div>
+
+    <h1>
+        Turn your idea into a comic.
+    </h1>
+
+    <p class="subtitle">
+        Create stories, illustrations and complete
+        six-panel comics with AI.
+    </p>
+
+</header>
+
+
+<!-- ==================================================
+     INPUT FORM
+     ================================================== -->
+
+<div class="card">
+
+<form id="comicForm">
+
+
+<label>
+    Comic Prompt
+</label>
+
+<textarea
+    id="prompt"
+    placeholder="Describe your comic idea..."
+    required></textarea>
+
+
+<label>
+    Main Character
+</label>
+
+<input
+    id="character"
+    placeholder="Example: Ananya, a brave school girl"
+    required>
+
+
+<label>
+    Setting
+</label>
+
+<input
+    id="setting"
+    placeholder="Example: A magical school"
+    required>
+
+
+<label>
+    Story Tone
+</label>
+
+<select id="tone">
+
+    <option>Fantasy Adventure</option>
+
+    <option>Funny</option>
+
+    <option>Action</option>
+
+    <option>Mystery</option>
+
+    <option>Science Fiction</option>
+
+    <option>Friendship</option>
+
+</select>
+
+
+<label>
+    Art Style
+</label>
+
+<select id="art_style">
+
+    <option>Comic Book</option>
+
+    <option>Anime</option>
+
+    <option>Cartoon</option>
+
+    <option>Watercolor</option>
+
+    <option>Digital Art</option>
+
+</select>
+
+
+<button
+    type="submit"
+    class="generate-btn"
+    id="generateBtn">
+
+    ✨ Generate Comic
+
+</button>
+
+
+</form>
+
+
+<div
+    class="loading"
+    id="loading">
+
+    <div class="spinner"></div>
+
+    <div>
+        Creating your story and six unique
+        comic illustrations...
+    </div>
+
+</div>
+
+
+<div
+    class="error"
+    id="error">
+</div>
+
+
+</div>
+
+
+<!-- ==================================================
+     RESULT
+     ================================================== -->
+
+<div id="result">
+
+    <h2
+        class="story-title"
+        id="storyTitle">
+    </h2>
+
+
+    <div
+        class="introduction"
+        id="introduction">
+    </div>
+
+
+    <div
+        class="comic-grid"
+        id="comicGrid">
+    </div>
+
+
+    <div class="actions">
+
+        <button
+            class="pdf-btn"
+            onclick="downloadPDF()">
+
+            📥 Download Comic as PDF
+
+        </button>
+
+
+        <button
+            class="new-btn"
+            onclick="createAnotherComic()">
+
+            🔄 Create Another Comic
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+let generatedPanels = [];
+
+
+/* ==================================================
+   GENERATE COMIC
+   ================================================== */
+
+document
+    .getElementById("comicForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const generateBtn =
+                document.getElementById(
+                    "generateBtn"
+                );
+
+
+            const loading =
+                document.getElementById(
+                    "loading"
+                );
+
+
+            const result =
+                document.getElementById(
+                    "result"
+                );
+
+
+            const errorBox =
+                document.getElementById(
+                    "error"
+                );
+
+
+            errorBox.style.display =
+                "none";
+
+
+            result.style.display =
+                "none";
+
+
+            generateBtn.disabled =
+                true;
+
+
+            loading.style.display =
+                "block";
+
+
+            const data = {
+
+                prompt:
+                    document.getElementById(
+                        "prompt"
+                    ).value,
+
+                character:
+                    document.getElementById(
+                        "character"
+                    ).value,
+
+                setting:
+                    document.getElementById(
+                        "setting"
+                    ).value,
+
+                tone:
+                    document.getElementById(
+                        "tone"
+                    ).value,
+
+                art_style:
+                    document.getElementById(
+                        "art_style"
+                    ).value
+
+            };
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/generate",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(data)
+
+                        }
+                    );
+
+
+                const resultData =
+                    await response.json();
+
+
+                if (!resultData.success) {
+
+                    throw new Error(
+                        resultData.message ||
+                        "Comic generation failed."
+                    );
+
+                }
+
+
+                generatedPanels =
+                    resultData.panels;
+
+
+                displayComic(
+                    resultData
+                );
+
+
+            }
+
+            catch(error) {
+
+                console.error(
+                    error
+                );
+
+
+                errorBox.textContent =
+                    error.message;
+
+
+                errorBox.style.display =
+                    "block";
+
+            }
+
+            finally {
+
+                loading.style.display =
+                    "none";
+
+                generateBtn.disabled =
+                    false;
+
+            }
+
+        }
+    );
+
+
+/* ==================================================
+   DISPLAY COMIC
+   ================================================== */
+
+function displayComic(data) {
+
+    const grid =
+        document.getElementById(
+            "comicGrid"
+        );
+
+
+    const title =
+        document.getElementById(
+            "storyTitle"
+        );
+
+
+    const intro =
+        document.getElementById(
+            "introduction"
+        );
+
+
+    title.textContent =
+        extractTitle(
+            data.story
+        );
+
+
+    intro.textContent =
+        extractIntro(
+            data.story
+        );
+
+
+    grid.innerHTML =
+        "";
+
+
+    data.panels.forEach(
+        function(panel) {
+
+            const panelDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            panelDiv.className =
+                "panel";
+
+
+            const imageHTML =
+                panel.image_url
+
+                ?
+
+                `<div class="panel-image">
+                    <img
+                        src="${panel.image_url}"
+                        alt="Comic Panel ${panel.number}">
+                 </div>`
+
+                :
+
+                `<div class="panel-image">
+                    <div style="
+                        padding:80px 20px;
+                        text-align:center;
+                        color:#aaa;
+                    ">
+                        Image unavailable
+                    </div>
+                 </div>`;
+
+
+            panelDiv.innerHTML =
+
+                `
+                <div class="panel-number">
+                    Panel ${panel.number}
+                </div>
+
+                ${imageHTML}
+
+                <div class="panel-content">
+
+                    <div class="story-label">
+                        Story
+                    </div>
+
+                    <div class="story-text">
+                        ${escapeHTML(
+                            panel.story || ""
+                        )}
+                    </div>
+
+                    <div class="dialogue-label">
+                        Dialogue
+                    </div>
+
+                    <div class="dialogue">
+                        ${escapeHTML(
+                            panel.dialogue || ""
+                        )}
+                    </div>
+
+                </div>
+                `;
+
+
+            grid.appendChild(
+                panelDiv
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+
+    setTimeout(
+        function() {
+
+            document.getElementById(
+                "result"
+            ).scrollIntoView({
+                behavior: "smooth"
+            });
+
+        },
+        100
+    );
+
+}
+
+
+/* ==================================================
+   EXTRACT TITLE
+   ================================================== */
+
+function extractTitle(story) {
+
+    const match =
+        story.match(
+            /TITLE:\s*(.*?)(?:\n|$)/i
+        );
+
+
+    if (match) {
+
+        return match[1].trim();
+
+    }
+
+
+    return "My AI Comic";
+
+}
+
+
+/* ==================================================
+   EXTRACT INTRO
+   ================================================== */
+
+function extractIntro(story) {
+
+    const match =
+        story.match(
+            /INTRO:\s*(.*?)(?=\s*CHARACTER:)/is
+        );
+
+
+    if (match) {
+
+        return match[1].trim();
+
+    }
+
+
+    return "An AI-generated comic adventure.";
+
+}
+
+
+/* ==================================================
+   ESCAPE HTML
+   ================================================== */
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ==================================================
+   DOWNLOAD PDF
+   ================================================== */
+
+async function downloadPDF() {
+
+    if (
+        !generatedPanels.length
+    ) {
+
+        alert(
+            "Please generate a comic first."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/download-pdf",
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            panels:
+                                generatedPanels
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            throw new Error(
+                data.message ||
+                "PDF creation failed."
+            );
+
+        }
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            data.pdf_url;
+
+
+        link.download =
+            "ComicCraft_Comic.pdf";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+    }
+
+    catch(error) {
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   CREATE ANOTHER COMIC
+   ================================================== */
+
+function createAnotherComic() {
+
+    generatedPanels =
+        [];
+
+
+    document.getElementById(
+        "comicForm"
+    ).reset();
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "error"
+    ).style.display =
+        "none";
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
